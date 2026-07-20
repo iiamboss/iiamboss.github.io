@@ -1,0 +1,104 @@
+/* ─────────────────────────────────────────────
+   한글 조판
+
+   AstroPaper 는 라틴 문자 기준으로 만들어져 있어 한글에 필요한 규칙이 없다.
+   테마를 업데이트해도 덮이지 않도록 별도 파일로 분리해 둔다.
+
+   폰트 CSS 는 여기서 @import 하지 않는다. Vite 가 원격 @import 를 인라인도
+   하지 않고 제거해버려서 @font-face 가 통째로 사라진다(토큰만 남고 폰트는
+   안 받아진다). 실제 <link> 는 src/layouts/Layout.astro 의 head 에 있다.
+   ───────────────────────────────────────────── */
+
+@layer base {
+  body {
+    /* CSS 는 한국어를 CJK 로 묶어 취급한다. 중국어·일본어는 띄어쓰기가 없어
+       글자 단위 아무 데나 끊는 게 정상이지만, 한국어는 어절 경계가 이미 있다.
+       keep-all 이 없으면 "통째로" 가 "통 / 째로" 로 끊긴다.
+
+       단, keep-all 만 주면 끊을 수 없는 긴 토큰(URL, setupWSConnection 같은
+       긴 식별자)이 컨테이너를 뚫는다. overflow-wrap 이 그때만 발동하는
+       안전망이라 둘은 짝으로 있어야 한다. */
+    word-break: keep-all;
+    overflow-wrap: break-word;
+
+    /* 한글은 라틴보다 글자가 빽빽해서 라틴 기준 행간(1.5~1.6)이면 답답하다 */
+    line-height: 1.8;
+  }
+
+  /* 제목은 본문만큼 행간을 벌리면 줄끼리 떨어져 보인다 */
+  h1,
+  h2,
+  h3,
+  h4 {
+    line-height: 1.45;
+  }
+}
+
+/* 본문 영역도 같은 규칙을 받는다. Tailwind Typography 가 prose 안에서
+   line-height 를 다시 잡기 때문에 여기서 덮어써야 한다. */
+.prose :where(p, li, blockquote):not(:where(.not-prose *)) {
+  line-height: 1.85;
+}
+
+/* 코드블록은 고정폭이고 줄바꿈 규칙이 다르다. 위 설정을 물려받으면 안 된다. */
+.prose :where(pre, code):not(:where(.not-prose *)) {
+  word-break: normal;
+  line-height: 1.7;
+}
+
+/* ─────────────────────────────────────────────
+   한글 폰트
+
+   AstroPaper 는 본문까지 Google Sans Code(고정폭)로 간다. 라틴에서는 성립하는
+   컨셉이지만 한글 장문에는 안 맞아서, 읽는 글은 Pretendard 로 돌린다.
+
+   Pretendard: dynamic-subset 을 쓴다. 유니코드 범위별로 파일이 쪼개져 있어
+   브라우저가 실제로 쓰인 글자 조각만 받는다. 서브셋을 직접 만들고 새 글 쓸
+   때마다 다시 굽는 관리가 필요 없다.
+
+   D2Coding: 코드블록용. 글 6편 중 4편의 코드에 한글 주석이 있는데, 대부분의
+   코딩 폰트(JetBrains Mono, Fira Code, Google Sans Code)는 한글 글리프가
+   없어서 주석만 다른 폰트로 떨어지고 한 줄 안에서 정렬이 어긋난다.
+   D2Coding 은 한글을 라틴 정확히 2배폭으로 그려 그 문제가 없다.
+   local() 이 먼저라 이미 설치된 사용자는 내려받지 않는다.
+   (Regular 357KB / Bold 396KB. 필요한 굵기만 실제로 받는다)
+   ───────────────────────────────────────────── */
+
+@theme {
+  /* 본문·UI. 마지막에 테마 원래 폰트를 남겨 폴백 사슬을 끊지 않는다 */
+  --font-app:
+    "Pretendard Variable", Pretendard, var(--font-google-sans-code), system-ui,
+    sans-serif;
+
+  --font-code:
+    "D2Coding", var(--font-google-sans-code), ui-monospace, SFMono-Regular,
+    Menlo, monospace;
+}
+
+/* 코드는 고정폭으로 되돌린다. body 의 font-app 을 물려받으면 안 된다. */
+code,
+kbd,
+samp,
+pre,
+pre code,
+.prose :where(code, pre):not(:where(.not-prose *)) {
+  font-family: var(--font-code);
+}
+
+/* ─────────────────────────────────────────────
+   mermaid 다이어그램
+
+   width 를 명시해야 한다. figure 는 shrink-to-fit 이고 mermaid SVG 는
+   width="100%" 라, 폭을 안 주면 서로를 참조하며 0x0 으로 접힌다.
+   ───────────────────────────────────────────── */
+.mermaid-diagram {
+  width: 100%;
+  margin: 1.75rem 0;
+  overflow-x: auto;
+  text-align: center;
+}
+
+.mermaid-diagram svg {
+  max-width: 100%;
+  height: auto;
+}
