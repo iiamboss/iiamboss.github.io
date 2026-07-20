@@ -4,7 +4,8 @@
  *   true  → 모든 페이지에 noindex 메타, robots.txt 에서 sitemap 안내 제거
  *   false → 공개, 색인 허용
  *
- * 내용 검토가 끝나면 false 로 바꾼다. 그 한 줄이 전부다.
+ * 다시 비공개로 돌리려면 true. 그 한 줄이 전부다. 단 되돌리는 쪽이 훨씬
+ * 비싸다 — 한번 색인되면 검색 결과에서 빠지는 데 시간이 걸린다.
  *
  * 크롤링 자체(Allow: /)는 막지 않는다. Disallow 로 막아버리면 크롤러가 각
  * 페이지의 noindex 메타를 읽지 못해, 이미 색인된 페이지가 오히려 검색 결과에서
@@ -14,4 +15,4 @@
  * 때 src/pages/robots.txt.ts 와 src/layouts/Layout.astro 의 연결이 유지되는지
  * 확인할 것.
  */
-export const NOINDEX = true;
+export const NOINDEX = false;

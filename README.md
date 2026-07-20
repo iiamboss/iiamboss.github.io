@@ -116,12 +116,21 @@ CNAME  www.iamboss.today   iiamboss.github.io
 
 민감한 개인 정보(연락처 상세·생년 등)는 사이트에 싣지 않는다. 문서로만 전달.
 
-## 공개 전 체크리스트
+## 검색엔진 색인
 
-- [ ] `src/noindex.ts` 의 `NOINDEX` 를 `false` 로 (검색엔진 색인 허용)
+`src/noindex.ts` 의 `NOINDEX` 한 줄이 스위치다. 지금은 `false` — 색인 허용.
 
-지금은 `true` — 모든 페이지에 `noindex` 메타가 붙고 `robots.txt` 에서 sitemap 안내가
-빠진다. 크롤링 자체는 막지 않는데, 이유는 `src/noindex.ts` 주석에 적어 뒀다.
+`true` 로 바꾸면 모든 페이지에 `noindex` 메타가 붙고 `robots.txt` 에서 sitemap
+안내가 빠진다. 크롤링 자체(`Allow: /`)는 어느 쪽이든 막지 않는다. 그 이유는
+`src/noindex.ts` 주석에 적어 뒀다.
+
+색인 허용은 **허용**이지 즉시 반영이 아니다. 구글이 다시 크롤링할 때까지
+며칠~몇 주 걸린다. 앞당기려면 [Search Console](https://search.google.com/search-console)
+에 등록하고 `https://iamboss.today/sitemap-index.xml` 을 직접 제출한다.
+
+소유 확인은 별개다. `PUBLIC_GOOGLE_SITE_VERIFICATION` 환경변수로 메타태그를
+넣을 수 있게 해 뒀지만(`astro.config.ts`), CI 에 값이 없어서 지금은 안 붙는다.
+DNS 를 이미 Cloudflare 로 관리하고 있으니 TXT 레코드로 확인하는 편이 간단하다.
 
 ## 테마
 
